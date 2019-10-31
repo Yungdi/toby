@@ -4,3 +4,4 @@ CREATE TABLE toby.users
     name     VARCHAR(20) not null,
     password VARCHAR(10) not null
 );
+ALTER TABLE toby.users convert to charset utf8;
