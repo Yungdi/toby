@@ -6,6 +6,7 @@ build/
 !**/src/test/**
 *.log
 *.log.gz
+db_volumes
 
 ### STS ###
 .apt_generated
