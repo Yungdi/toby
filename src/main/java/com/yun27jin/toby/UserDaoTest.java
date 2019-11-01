@@ -1,6 +1,6 @@
 package com.yun27jin.toby;
 
-import com.yun27jin.toby.user.dao.NConnectionMaker;
+import com.yun27jin.toby.user.dao.DaoFactory;
 import com.yun27jin.toby.user.dao.UserDao;
 import com.yun27jin.toby.user.domain.User;
 
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class UserDaoTest {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        UserDao userDao = new UserDao(new NConnectionMaker());
+        UserDao userDao = new DaoFactory().userDao();
         User user = new User();
         user.setId("yun27jin");
         user.setPassword("1234");
