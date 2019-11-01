@@ -4,12 +4,9 @@ import com.yun27jin.toby.user.domain.User;
 
 import java.sql.*;
 
-public class UserDao {
+public abstract class UserDao {
 
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("org.mariadb.jdbc.Driver");
-        return DriverManager.getConnection("jdbc:mariadb://localhost:3307/toby", "root", "root");
-    }
+    protected abstract Connection getConnection() throws SQLException, ClassNotFoundException;
 
     public void add(User user) throws ClassNotFoundException, SQLException {
         Connection c = this.getConnection();
