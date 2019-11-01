@@ -4,12 +4,15 @@ import com.yun27jin.toby.user.domain.User;
 
 import java.sql.*;
 
-public abstract class UserDao {
+public class UserDao {
+    private final ConnectionMaker connectionMaker;
 
-    protected abstract Connection getConnection() throws SQLException, ClassNotFoundException;
+    public UserDao(ConnectionMaker connectionMaker) {
+        this.connectionMaker = connectionMaker;
+    }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Connection c = this.getConnection();
+        Connection c = connectionMaker.makeConnection();
         PreparedStatement psmt = c.prepareStatement("INSERT INTO toby.users(id, password, name) VALUES (?, ?, ?)");
         psmt.setString(1, user.getId());
         psmt.setString(2, user.getPassword());
@@ -20,7 +23,7 @@ public abstract class UserDao {
     }
 
     public User get(String id) throws SQLException, ClassNotFoundException {
-        Connection c = this.getConnection();
+        Connection c = connectionMaker.makeConnection();
         PreparedStatement psmt = c.prepareStatement("SELECT * FROM toby.users");
         ResultSet rs = psmt.executeQuery();
         rs.next();
