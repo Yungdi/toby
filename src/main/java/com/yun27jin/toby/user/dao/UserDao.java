@@ -4,12 +4,13 @@ import com.yun27jin.toby.user.domain.User;
 
 import java.sql.*;
 
-public class UserDao {
+public abstract class UserDao {
+
+    protected abstract Connection getConnection() throws SQLException, ClassNotFoundException;
 
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Class.forName("org.mariadb.jdbc.Driver");
-        Connection c = DriverManager.getConnection("jdbc:mariadb://localhost:3307/toby", "root", "root");
-        PreparedStatement psmt = c.prepareStatement("INSERT INTO users(id, password, name) VALUES (?, ?, ?)");
+        Connection c = this.getConnection();
+        PreparedStatement psmt = c.prepareStatement("INSERT INTO toby.users(id, password, name) VALUES (?, ?, ?)");
         psmt.setString(1, user.getId());
         psmt.setString(2, user.getPassword());
         psmt.setString(3, user.getName());
@@ -19,8 +20,7 @@ public class UserDao {
     }
 
     public User get(String id) throws SQLException, ClassNotFoundException {
-        Class.forName("org.mariadb.jdbc.Driver");
-        Connection c = DriverManager.getConnection("jdbc:mariadb://localhost:3307/toby", "root", "root");
+        Connection c = this.getConnection();
         PreparedStatement psmt = c.prepareStatement("SELECT * FROM toby.users");
         ResultSet rs = psmt.executeQuery();
         rs.next();
