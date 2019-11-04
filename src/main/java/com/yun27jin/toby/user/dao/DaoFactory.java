@@ -24,14 +24,4 @@ public class DaoFactory {
         return dataSource;
     }
 
-    @Bean
-    public ConnectionMaker connectionMaker() {
-        return new CountingConnectionMaker(realConnectionMaker());
-    }
-
-    @Bean
-    ConnectionMaker realConnectionMaker() {
-        return new DConnectionMaker();
-    }
-
 }
