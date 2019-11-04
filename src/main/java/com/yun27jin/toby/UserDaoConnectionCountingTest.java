@@ -1,4 +1,4 @@
-package com.yun27jin.toby.user;
+package com.yun27jin.toby;
 
 import com.yun27jin.toby.user.dao.CountingConnectionMaker;
 import com.yun27jin.toby.user.dao.DaoFactory;
