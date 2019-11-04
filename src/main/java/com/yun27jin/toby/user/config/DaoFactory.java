@@ -1,5 +1,6 @@
-package com.yun27jin.toby.user.dao;
+package com.yun27jin.toby.user.config;
 
+import com.yun27jin.toby.user.dao.UserDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
