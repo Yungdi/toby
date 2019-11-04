@@ -7,8 +7,14 @@
         <bean id="xmlCountingConnectionMaker" class="com.yun27jin.toby.user.dao.CountingConnectionMaker">
             <property name="realConnectionMaker" ref="xmlConnectionMaker"/>
         </bean>
+        <bean id="xmlDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+            <property name="driverClass" value="org.mariadb.jdbc.Driver"/>
+            <property name="url" value="jdbc:mariadb://localhost:3307/toby"/>
+            <property name="username" value="root"/>
+            <property name="password" value="root"/>
+        </bean>
         <bean id="xmlUserDao" class="com.yun27jin.toby.user.dao.UserDao">
-            <property name="connectionMaker" ref="xmlCountingConnectionMaker"/>
+            <property name="dataSource" ref="xmlDataSource"/>
         </bean>
     </beans>
 </beans>
