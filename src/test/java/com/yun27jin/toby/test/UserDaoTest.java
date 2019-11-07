@@ -7,23 +7,38 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = DaoFactory.class)
 public class UserDaoTest {
+    @Autowired
+    private ApplicationContext context;
     private UserDao userDao;
     private User user1;
     private User user2;
     private User user3;
 
-    @Before
-    public void setUp() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        this.userDao = context.getBean("userDao", UserDao.class);
 
+    @Before
+//    @DirtiesContext
+    public void setUp() {
+        System.out.println(this.context);
+        System.out.println(this);
+        this.userDao = this.context.getBean("userDao", UserDao.class);
+        DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://localhost:3307/toby", "root", "root", true);
+        this.userDao.setDataSource(dataSource);
         this.user1 = new User("jyj", "장윤진", "1234");
         this.user2 = new User("kyn", "김연아", "1234");
         this.user3 = new User("cwh", "천우희", "1234");
