@@ -7,21 +7,27 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 public class UserDao {
+    private JdbcContext jdbcContext;
     private DataSource dataSource;
 
     public UserDao() {
     }
 
-    public UserDao(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public UserDao(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
     }
 
-    public void setDataSource(DataSource dataSource) {
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
+    }
+
+    public UserDao setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+        return this;
     }
 
     public void add(User user) throws SQLException {
-        this.jdbcContextWithStatementStrategy(connection -> {
+        this.jdbcContext.workWithStatementStrategy(connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)");
             preparedStatement.setString(1, user.getId());
             preparedStatement.setString(2, user.getName());
@@ -31,7 +37,7 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        this.jdbcContextWithStatementStrategy(connection -> connection.prepareStatement("DELETE FROM toby.users"));
+        this.jdbcContext.workWithStatementStrategy(connection -> connection.prepareStatement("DELETE FROM toby.users"));
     }
 
     public User get(String id) throws SQLException {
@@ -74,32 +80,6 @@ public class UserDao {
                 } catch (SQLException ignored) {
                 }
             }
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ignored) {
-                }
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException ignored) {
-                }
-            }
-        }
-    }
-
-    private void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
-        Connection c = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            c = this.dataSource.getConnection();
-            preparedStatement = statementStrategy.makePreparedStatement(c);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
             if (preparedStatement != null) {
                 try {
                     preparedStatement.close();
