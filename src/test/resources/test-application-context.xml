@@ -10,6 +10,10 @@
             <property name="password" value="root"/>
         </bean>
         <bean id="xmlUserDao" class="com.yun27jin.toby.user.dao.UserDao">
+            <property name="jdbcContext" ref="xmlJdbcContext"/>
+            <property name="dataSource" ref="xmlDataSource"/>
+        </bean>
+        <bean id="xmlJdbcContext" class="com.yun27jin.toby.user.dao.JdbcContext">
             <property name="dataSource" ref="xmlDataSource"/>
         </bean>
     </beans>

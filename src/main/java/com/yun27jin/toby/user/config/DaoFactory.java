@@ -1,5 +1,6 @@
 package com.yun27jin.toby.user.config;
 
+import com.yun27jin.toby.user.dao.JdbcContext;
 import com.yun27jin.toby.user.dao.UserDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,12 @@ public class DaoFactory {
 
     @Bean
     public UserDao userDao() {
-        return new UserDao(dataSource());
+        return new UserDao(jdbcContext()).setDataSource(dataSource());
+    }
+
+    @Bean
+    public JdbcContext jdbcContext() {
+        return new JdbcContext(dataSource());
     }
 
     @Bean
