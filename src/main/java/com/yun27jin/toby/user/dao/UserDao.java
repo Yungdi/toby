@@ -21,14 +21,17 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        Connection connection = this.dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO toby.users(id, password, name) VALUES (?, ?, ?)");
-        preparedStatement.setString(1, user.getId());
-        preparedStatement.setString(2, user.getPassword());
-        preparedStatement.setString(3, user.getName());
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        connection.close();
+        this.jdbcContextWithStatementStrategy(connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)");
+            preparedStatement.setString(1, user.getId());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getPassword());
+            return preparedStatement;
+        });
+    }
+
+    public void deleteAll() throws SQLException {
+        this.jdbcContextWithStatementStrategy(connection -> connection.prepareStatement("DELETE FROM toby.users"));
     }
 
     public User get(String id) throws SQLException {
@@ -84,10 +87,6 @@ public class UserDao {
                 }
             }
         }
-    }
-
-    public void deleteAll() throws SQLException {
-        jdbcContextWithStatementStrategy(new DeleteAllStatementStrategy());
     }
 
     private void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
