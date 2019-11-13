@@ -7,30 +7,28 @@ import java.io.IOException;
 public class Calculator {
 
     public int add(String filePath) throws IOException {
-        return this.calculateTemplate(filePath, bufferedReader -> {
-            int sum = 0;
-            String line;
-            while ((line = bufferedReader.readLine()) != null)
-                sum += Integer.parseInt(line);
-            return sum;
-        });
+        return this.readLineTemplate(filePath, 0, (line, res) -> Integer.sum(Integer.parseInt(line), res));
     }
 
     public int multiply(String filePath) throws IOException {
-        return this.calculateTemplate(filePath, bufferedReader -> {
-            int sum = 1;
-            String line;
-            while ((line = bufferedReader.readLine()) != null)
-                sum *= Integer.parseInt(line);
-            return sum;
-        });
+        return this.readLineTemplate(filePath, 1, (line, res) -> Integer.parseInt(line) * res);
     }
 
-    private int calculateTemplate(String filePath, BufferedReaderCallback bufferedReaderCallback) throws IOException {
+    public String concat(String filePath) throws IOException {
+        return this.readLineTemplate(filePath, "", (line, res) -> line + res);
+    }
+
+
+    private <T> T readLineTemplate(String filePath, T initValue, LineCallback<T> lineCallback) throws IOException {
         BufferedReader bufferedReader = null;
         try {
             bufferedReader = new BufferedReader(new FileReader(filePath));
-            return bufferedReaderCallback.compute(bufferedReader);
+            T res = initValue;
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                res = lineCallback.compute(line, res);
+            }
+            return res;
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw e;

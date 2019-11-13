@@ -20,14 +20,20 @@ public class CalcSumTest {
 
     @Test
     public void add() throws IOException {
-        int calcSum = this.calculator.add(filePath);
-        Assert.assertThat(10, CoreMatchers.is(calcSum));
+        int res = this.calculator.add(filePath);
+        Assert.assertThat(10, CoreMatchers.is(res));
     }
 
     @Test
     public void multiply() throws IOException {
-        int calcSum = this.calculator.multiply(filePath);
-        Assert.assertThat(24, CoreMatchers.is(calcSum));
+        int res = this.calculator.multiply(filePath);
+        Assert.assertThat(24, CoreMatchers.is(res));
+    }
+
+    @Test
+    public void concat() throws IOException {
+        String res = this.calculator.concat(filePath);
+        Assert.assertThat("4321", CoreMatchers.is(res));
     }
 
 }
