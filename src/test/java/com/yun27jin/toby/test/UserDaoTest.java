@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DaoFactory.class)
@@ -67,6 +68,10 @@ public class UserDaoTest {
         this.userDao.add(this.user1);
         this.userDao.add(this.user2);
         this.userDao.add(this.user3);
+        Set<User> set = new HashSet<>(Arrays.asList(this.user1, this.user2, this.user3));
+
+        Set<User> userSet = this.userDao.get();
+        Assert.assertThat(userSet, CoreMatchers.is(set));
 
         User user4 = this.userDao.get(user1.getId());
         Assert.assertThat(user4.getName(), CoreMatchers.is(user1.getName()));

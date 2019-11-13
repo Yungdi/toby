@@ -5,6 +5,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
+import java.util.Set;
 
 public class UserDao {
     private JdbcContext jdbcContext;
@@ -27,17 +29,20 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        this.jdbcContext.workWithStatementStrategy(connection -> {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)");
-            preparedStatement.setString(1, user.getId());
-            preparedStatement.setString(2, user.getName());
-            preparedStatement.setString(3, user.getPassword());
-            return preparedStatement;
-        });
+        this.jdbcContext.executeSql("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)",
+                user.getId(), user.getName(), user.getPassword());
     }
 
     public void deleteAll() throws SQLException {
-        this.jdbcContext.workWithStatementStrategy(connection -> connection.prepareStatement("DELETE FROM toby.users"));
+        this.jdbcContext.executeSql("DELETE FROM toby.users");
+    }
+
+    public Set<User> get() throws SQLException {
+        return this.jdbcContext.executeSql("SELECT * FROM toby.users",
+                resultSet ->
+                        new User(resultSet.getString("id"),
+                                resultSet.getString("name"),
+                                resultSet.getString("password")));
     }
 
     public User get(String id) throws SQLException {
