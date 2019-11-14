@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,20 +34,15 @@ public class UserDaoTest {
 
 
     @Before
-//    @DirtiesContext
     public void setUp() {
-        System.out.println(this.context);
-        System.out.println(this);
         this.userDao = this.context.getBean("userDao", UserDao.class);
-        DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://localhost:3307/toby", "root", "root", true);
-        this.userDao.setDataSource(dataSource);
         this.user1 = new User("jyj", "장윤진", "1234");
         this.user2 = new User("kyn", "김연아", "1234");
         this.user3 = new User("cwh", "천우희", "1234");
     }
 
     @Test
-    public void count() throws SQLException {
+    public void count() {
         this.userDao.deleteAll();
         Assert.assertThat(this.userDao.getCount(), CoreMatchers.is(0));
 
@@ -61,17 +57,16 @@ public class UserDaoTest {
     }
 
     @Test
-    public void addAndGet() throws SQLException {
+    public void addAndGet() {
         this.userDao.deleteAll();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
 
         this.userDao.add(this.user1);
         this.userDao.add(this.user2);
         this.userDao.add(this.user3);
-        Set<User> set = new HashSet<>(Arrays.asList(this.user1, this.user2, this.user3));
 
-        Set<User> userSet = this.userDao.get();
-        Assert.assertThat(userSet, CoreMatchers.is(set));
+        List<User> userList = this.userDao.get();
+        Assert.assertThat(userList, CoreMatchers.hasItems(this.user1, this.user2, this.user3));
 
         User user4 = this.userDao.get(user1.getId());
         Assert.assertThat(user4.getName(), CoreMatchers.is(user1.getName()));
@@ -87,7 +82,7 @@ public class UserDaoTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void getUserFailure() throws SQLException {
+    public void getUserFailure() {
         this.userDao.deleteAll();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
         this.userDao.get("unknown-id");
