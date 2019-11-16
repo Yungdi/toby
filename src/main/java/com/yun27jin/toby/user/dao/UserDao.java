@@ -26,10 +26,6 @@ public class UserDao {
                 user.getId(), user.getName(), user.getPassword());
     }
 
-    public void deleteAll() {
-        this.jdbcTemplate.update("DELETE FROM toby.users");
-    }
-
     public User get(String id) {
         return this.jdbcTemplate.queryForObject("SELECT * FROM toby.users WHERE id = ?", new Object[]{id}, this.userRowMapper());
     }
@@ -37,11 +33,20 @@ public class UserDao {
     public List<User> get() {
         return this.jdbcTemplate.query("SELECT * FROM toby.users", this.userRowMapper());
     }
-¡
+
     private RowMapper<User> userRowMapper() {
-        return (resultSet, rowNum) -> new User(resultSet.getString("id"),
-                resultSet.getString("name"),
-                resultSet.getString("password"));
+        return (resultSet, rowNum) ->
+                new User(resultSet.getString("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("password"));
+    }
+
+    public void delete(String id) {
+        this.jdbcTemplate.update("DELETE FROM toby.users", new Object[]{id});
+    }
+
+    public void delete() {
+        this.jdbcTemplate.update("DELETE FROM toby.users");
     }
 
     public Integer getCount() {

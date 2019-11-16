@@ -10,16 +10,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,7 +37,7 @@ public class UserDaoTest {
 
     @Test
     public void count() {
-        this.userDao.deleteAll();
+        this.userDao.delete();
         Assert.assertThat(this.userDao.getCount(), CoreMatchers.is(0));
 
         this.userDao.add(this.user1);
@@ -58,7 +52,7 @@ public class UserDaoTest {
 
     @Test
     public void addAndGet() {
-        this.userDao.deleteAll();
+        this.userDao.delete();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
 
         this.userDao.add(this.user1);
@@ -83,7 +77,7 @@ public class UserDaoTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getUserFailure() {
-        this.userDao.deleteAll();
+        this.userDao.delete();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
         this.userDao.get("unknown-id");
     }
