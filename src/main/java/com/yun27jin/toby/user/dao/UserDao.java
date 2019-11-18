@@ -1,9 +1,14 @@
 package com.yun27jin.toby.user.dao;
 
 import com.yun27jin.toby.user.domain.User;
+import com.yun27jin.toby.user.exception.DuplicatedUserIdException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserDao {
@@ -25,6 +30,32 @@ public class UserDao {
         this.jdbcTemplate.update("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)",
                 user.getId(), user.getName(), user.getPassword());
     }
+
+    public void legacyAdd(User user) throws DuplicatedUserIdException {
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = dataSource.getConnection().prepareStatement("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)");
+            preparedStatement.setString(1, user.getId());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062)
+                throw new DuplicatedUserIdException(e);
+            else
+                throw new RuntimeException(e);
+        } finally {
+            if (preparedStatement != null)
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+
+                }
+        }
+
+    }
+
 
     public User get(String id) {
         return this.jdbcTemplate.queryForObject("SELECT * FROM toby.users WHERE id = ?", new Object[]{id}, this.userRowMapper());

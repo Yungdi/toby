@@ -3,6 +3,7 @@ package com.yun27jin.toby.test;
 import com.yun27jin.toby.user.config.DaoFactory;
 import com.yun27jin.toby.user.dao.UserDao;
 import com.yun27jin.toby.user.domain.User;
+import com.yun27jin.toby.user.exception.DuplicatedUserIdException;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,7 @@ public class UserDaoTest {
         this.user1 = new User("jyj", "장윤진", "1234");
         this.user2 = new User("kyn", "김연아", "1234");
         this.user3 = new User("cwh", "천우희", "1234");
+        this.userDao.delete();
     }
 
     @Test
@@ -52,7 +54,6 @@ public class UserDaoTest {
 
     @Test
     public void addAndGet() {
-        this.userDao.delete();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
 
         this.userDao.add(this.user1);
@@ -77,9 +78,15 @@ public class UserDaoTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getUserFailure() {
-        this.userDao.delete();
         Assert.assertThat(userDao.getCount(), CoreMatchers.is(0));
         this.userDao.get("unknown-id");
+    }
+
+    @Test(expected = DuplicatedUserIdException.class)
+    public void addUserFailure() {
+        this.userDao.add(this.user1);
+        Assert.assertThat(userDao.getCount(), CoreMatchers.is(1));
+        this.userDao.legacyAdd(this.user1);
     }
 
 }
