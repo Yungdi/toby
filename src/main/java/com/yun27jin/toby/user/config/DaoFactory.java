@@ -1,6 +1,6 @@
 package com.yun27jin.toby.user.config;
 
-import com.yun27jin.toby.user.dao.UserDao;
+import com.yun27jin.toby.user.dao.UserDaoJdbc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,8 +12,8 @@ import javax.sql.DataSource;
 public class DaoFactory {
 
     @Bean
-    public UserDao userDao() {
-        return new UserDao().setJdbcTemplate(jdbcTemplate());
+    public UserDaoJdbc userDao() {
+        return new UserDaoJdbc().setJdbcTemplate(jdbcTemplate());
     }
 
     @Bean
