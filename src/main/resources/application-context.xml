@@ -9,7 +9,7 @@
             <property name="username" value="root"/>
             <property name="password" value="root"/>
         </bean>
-        <bean id="xmlUserDao" class="com.yun27jin.toby.user.dao.UserDao">
+        <bean id="xmlUserDao" class="com.yun27jin.toby.user.dao.UserDaoJdbc">
             <property name="jdbcTemplate" ref="xmlJdbcTemplate"/>
         </bean>
         <bean id="xmlJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
