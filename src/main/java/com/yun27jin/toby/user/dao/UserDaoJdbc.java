@@ -1,5 +1,6 @@
 package com.yun27jin.toby.user.dao;
 
+import com.yun27jin.toby.user.domain.Level;
 import com.yun27jin.toby.user.domain.User;
 import com.yun27jin.toby.user.exception.DuplicatedUserIdException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,8 +27,14 @@ public class UserDaoJdbc implements UserDao {
     }
 
     public void add(User user) {
-        this.jdbcTemplate.update("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)",
-                user.getId(), user.getName(), user.getPassword());
+        this.jdbcTemplate.update(
+                "INSERT INTO toby.users(id, name, password, level, login, recommend) VALUES (?, ?, ?, ?, ?, ?)",
+                user.getId(),
+                user.getName(),
+                user.getPassword(),
+                user.getLevel().intValue(),
+                user.getLogin(),
+                user.getRecommend());
     }
 
     public void legacyAdd(User user) throws DuplicatedUserIdException {
@@ -41,7 +48,7 @@ public class UserDaoJdbc implements UserDao {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             int errorCode = e.getErrorCode();
-            if (errorCode == 1062 || errorCode ==1 || errorCode == -803)
+            if (errorCode == 1062 || errorCode == 1 || errorCode == -803)
                 throw new DuplicatedUserIdException(e);
             else
                 throw new RuntimeException(e);
@@ -57,18 +64,24 @@ public class UserDaoJdbc implements UserDao {
     }
 
     public User get(String id) {
-        return this.jdbcTemplate.queryForObject("SELECT * FROM toby.users WHERE id = ?", new Object[]{id}, this.userRowMapper());
+        return this.jdbcTemplate.queryForObject(
+                "SELECT * FROM toby.users WHERE id = ?",
+                new Object[]{id},
+                this.userMapper());
     }
 
     public List<User> get() {
-        return this.jdbcTemplate.query("SELECT * FROM toby.users", this.userRowMapper());
+        return this.jdbcTemplate.query("SELECT * FROM toby.users", this.userMapper());
     }
 
-    private RowMapper<User> userRowMapper() {
+    private RowMapper<User> userMapper() {
         return (resultSet, rowNum) ->
                 new User(resultSet.getString("id"),
                         resultSet.getString("name"),
-                        resultSet.getString("password"));
+                        resultSet.getString("password"),
+                        Level.valueOf(Integer.parseInt(resultSet.getString("level"))),
+                        resultSet.getInt("login"),
+                        resultSet.getInt("recommend"));
     }
 
     public void delete(String id) {
@@ -81,6 +94,13 @@ public class UserDaoJdbc implements UserDao {
 
     public int getCount() {
         return this.jdbcTemplate.queryForObject("SELECT count(*) FROM toby.users", Integer.class);
+    }
+
+    @Override
+    public void update(User user) {
+        this.jdbcTemplate.update("UPDATE toby.users SET name = ?, password = ?, level = ?, login = ?, recommend = ? WHERE id = ?",
+                user.getName(), user.getPassword(), user.getLevel().intValue(),
+                user.getLogin(), user.getRecommend(), user.getId());
     }
 
 }

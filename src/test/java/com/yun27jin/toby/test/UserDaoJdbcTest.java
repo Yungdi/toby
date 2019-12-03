@@ -2,6 +2,7 @@ package com.yun27jin.toby.test;
 
 import com.yun27jin.toby.user.config.DaoFactory;
 import com.yun27jin.toby.user.dao.UserDao;
+import com.yun27jin.toby.user.domain.Level;
 import com.yun27jin.toby.user.domain.User;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -34,9 +35,9 @@ public class UserDaoJdbcTest {
 
     @Before
     public void setUp() {
-        this.user1 = new User("jyj", "장윤진", "1234");
-        this.user2 = new User("kyn", "김연아", "1234");
-        this.user3 = new User("cwh", "천우희", "1234");
+        this.user1 = new User("jyj", "장윤진", "1234", Level.BASIC, 1, 0);
+        this.user2 = new User("kyn", "김연아", "1234", Level.SILVER, 55, 10);
+        this.user3 = new User("cwh", "천우희", "1234", Level.GOLD, 100, 40);
         this.userDao.delete();
     }
 
@@ -66,17 +67,12 @@ public class UserDaoJdbcTest {
         List<User> userList = this.userDao.get();
         Assert.assertThat(userList, CoreMatchers.hasItems(this.user1, this.user2, this.user3));
 
-        User user4 = this.userDao.get(user1.getId());
-        Assert.assertThat(user4.getName(), CoreMatchers.is(user1.getName()));
-        Assert.assertThat(user4.getPassword(), CoreMatchers.is(user1.getPassword()));
-
-        User user5 = this.userDao.get(user2.getId());
-        Assert.assertThat(user5.getName(), CoreMatchers.is(user2.getName()));
-        Assert.assertThat(user5.getPassword(), CoreMatchers.is(user2.getPassword()));
-
-        User user6 = this.userDao.get(user3.getId());
-        Assert.assertThat(user6.getName(), CoreMatchers.is(user3.getName()));
-        Assert.assertThat(user6.getPassword(), CoreMatchers.is(user3.getPassword()));
+        User getUser1 = this.userDao.get(user1.getId());
+        Assert.assertThat(getUser1, CoreMatchers.is(this.user1));
+        User getUser2 = this.userDao.get(this.user2.getId());
+        Assert.assertThat(getUser2, CoreMatchers.is(this.user2));
+        User getUser3 = this.userDao.get(this.user3.getId());
+        Assert.assertThat(getUser3, CoreMatchers.is(this.user3));
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -97,11 +93,32 @@ public class UserDaoJdbcTest {
             this.userDao.add(user1);
             this.userDao.add(user1);
         } catch (DuplicateKeyException e) {
-            SQLException sqlException  = (SQLException) e.getRootCause();
+            SQLException sqlException = (SQLException) e.getRootCause();
             SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
             DataAccessException translatedException = set.translate(null, null, sqlException);
             Assert.assertThat(translatedException, CoreMatchers.instanceOf(DuplicateKeyException.class));
         }
+    }
+
+    @Test
+    public void update() {
+        this.userDao.delete();
+        this.userDao.add(this.user1);
+        this.userDao.add(this.user2);
+
+        this.user1.setName("윤진");
+        this.user1.setPassword("spring");
+        this.user1.setLevel(Level.GOLD);
+        this.user1.setLogin(1000);
+        this.user1.setRecommend(999);
+
+        this.userDao.update(user1);
+
+        User updatedUser = this.userDao.get(this.user1.getId());
+        Assert.assertThat(updatedUser, CoreMatchers.is(this.user1));
+
+        User notUpdatedUser = this.userDao.get(this.user2.getId());
+        Assert.assertThat(notUpdatedUser, CoreMatchers.is(user2));
     }
 
 }
