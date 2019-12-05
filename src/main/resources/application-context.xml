@@ -15,5 +15,8 @@
         <bean id="xmlJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
             <property name="dataSource" ref="xmlDataSource"/>
         </bean>
+        <bean id="xmlUserService" class="com.yun27jin.toby.user.service.UserService">
+            <property name="userDao" ref="xmlUserDao"/>
+        </bean>
     </beans>
 </beans>

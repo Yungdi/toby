@@ -1,7 +1,10 @@
 CREATE TABLE toby.users
 (
-    id       VARCHAR(10) PRIMARY KEY,
-    name     VARCHAR(20) not null,
-    password VARCHAR(10) not null
+    id        VARCHAR(10) PRIMARY KEY,
+    name      VARCHAR(20) NOT NULL,
+    password  VARCHAR(10) NOT NULL,
+    level     TINYINT     NOT NULL,
+    login     INT         NOT NULL,
+    recommend INT         NOT NULL
 );
-ALTER TABLE toby.users convert to charset utf8;
+ALTER TABLE toby.users CONVERT TO CHARSET utf8;
