@@ -11,8 +11,8 @@ public class User {
     private int login;
     private int recommend;
 
-    public User() {
-    }
+    public static final int MIN_LOGIN_COUNT_FOR_SILVER = 50;
+    public static final int MIN_RECOMMEND_COUNT_FOR_GOLD =30;
 
     public User(String id, String name, String password, Level level, int login, int recommend) {
         this.id = id;
@@ -71,13 +71,26 @@ public class User {
         this.recommend = recommend;
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", User.class.getSimpleName() + "[", "]")
-                .add("id='" + id + "'")
-                .add("name='" + name + "'")
-                .add("password='" + password + "'")
-                .toString();
+    public void upgradeLevel() {
+        Level nextLevel = this.level.nextLevel();
+        if (nextLevel == null)
+            throw new IllegalStateException(this.level + "은 업그레이드가 불가능합니다");
+        else
+            this.level = nextLevel;
+    }
+
+    public boolean canUpgradeLevel(User user) {
+        Level level = user.getLevel();
+        switch (level) {
+            case BASIC:
+                return user.getLogin() >= MIN_LOGIN_COUNT_FOR_SILVER;
+            case SILVER:
+                return user.getRecommend() >= MIN_RECOMMEND_COUNT_FOR_GOLD;
+            case GOLD:
+                return false;
+            default:
+                throw new IllegalArgumentException("Unknown Level: " + level);
+        }
     }
 
     @Override
@@ -96,6 +109,18 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, password, level, login, recommend);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", User.class.getSimpleName() + "[", "]")
+                .add("id='" + id + "'")
+                .add("name='" + name + "'")
+                .add("password='" + password + "'")
+                .add("level=" + level)
+                .add("login=" + login)
+                .add("recommend=" + recommend)
+                .toString();
     }
 
 }

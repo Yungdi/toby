@@ -27,12 +27,15 @@ public class UserDaoJdbc implements UserDao {
     }
 
     public void add(User user) {
+        Level level = user.getLevel();
+        if (user.getLevel() == null)
+            level = Level.BASIC;
         this.jdbcTemplate.update(
                 "INSERT INTO toby.users(id, name, password, level, login, recommend) VALUES (?, ?, ?, ?, ?, ?)",
                 user.getId(),
                 user.getName(),
                 user.getPassword(),
-                user.getLevel().intValue(),
+                level.intValue(),
                 user.getLogin(),
                 user.getRecommend());
     }
