@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DaoFactory.class)
@@ -25,18 +28,19 @@ public class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private DataSource dataSource;
     private List<User> users;
 
     @Before
     public void setUp() {
         this.userDao.delete();
-        users = Arrays.asList(
-                new User("jyj", "장윤진", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER - 1, 0),
-                new User("yw", "연우", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER, 0),
-                new User("js", "지수", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD - 1),
-                new User("kyn", "김연아", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD),
-                new User("cwh", "천우희", "1234", Level.GOLD, 100, Integer.MAX_VALUE)
-        );
+        this.users = new ArrayList<>();
+        this.users.add(new User("a", "장윤진", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER - 1, 0));
+        this.users.add(new User("b", "연우", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER, 0));
+        this.users.add(new User("c", "지수", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD - 1));
+        this.users.add(new User("d", "김연아", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD));
+        this.users.add(new User("e", "천우희", "1234", Level.GOLD, 100, Integer.MAX_VALUE));
     }
 
     @Test
@@ -45,7 +49,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels() {
+    public void upgradeLevels() throws SQLException {
         for (User user : users) this.userDao.add(user);
         this.userService.upgradeLevels();
 
@@ -73,6 +77,22 @@ public class UserServiceTest {
         this.userDao.add(userWithoutLevel);
         Assert.assertThat(this.userDao.get(userWithLevel.getId()).getLevel(), CoreMatchers.is(Level.GOLD));
         Assert.assertThat(this.userDao.get(userWithoutLevel.getId()).getLevel(), CoreMatchers.is(Level.BASIC));
+    }
+
+    @Test
+    public void upgradeAllOrNothing() throws SQLException {
+        for (User user : users) userDao.add(user);
+
+        UserService testUserService = new UserService.TestUserService(users.get(3).getId());
+        testUserService.setUserDao(userDao);
+        testUserService.setDataSource(dataSource);
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException expected");
+        } catch (UserService.TestUserServiceException e) {
+        }
+        checkLevelUpgraded(users.get(1), false);
     }
 
 }

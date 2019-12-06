@@ -17,6 +17,7 @@
         </bean>
         <bean id="xmlUserService" class="com.yun27jin.toby.user.service.UserService">
             <property name="userDao" ref="xmlUserDao"/>
+            <property name="dataSource" ref="xmlDataSource"/>
         </bean>
     </beans>
 </beans>

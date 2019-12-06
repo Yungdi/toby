@@ -14,18 +14,20 @@ public class DaoFactory {
 
     @Bean
     public UserService userService() {
-        return new UserService().setUserDao(this.userDao());
+        return new UserService()
+                .setUserDao(userDao())
+                .setDataSource(dataSource());
     }
 
     @Bean
     public UserDaoJdbc userDao() {
-        return new UserDaoJdbc().setJdbcTemplate(this.jdbcTemplate());
+        return new UserDaoJdbc().setJdbcTemplate(jdbcTemplate());
     }
 
     @Bean
     public JdbcTemplate jdbcTemplate() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.setDataSource(this.dataSource());
+        jdbcTemplate.setDataSource(dataSource());
         return jdbcTemplate;
     }
 
