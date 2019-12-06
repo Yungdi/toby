@@ -2,32 +2,29 @@ package com.yun27jin.toby.user.service;
 
 import com.yun27jin.toby.user.dao.UserDao;
 import com.yun27jin.toby.user.domain.User;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserService {
     private UserDao userDao;
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
 
     public UserService setUserDao(UserDao userDao) {
         this.userDao = userDao;
         return this;
     }
 
-    public UserService setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public UserService setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
         return this;
     }
 
-    public void upgradeLevels() throws SQLException {
-        TransactionSynchronizationManager.initSynchronization();
-        Connection connection = DataSourceUtils.getConnection(dataSource);
-        connection.setAutoCommit(false);
+    public void upgradeLevels() {
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         try {
             List<User> users = this.userDao.get();
@@ -35,14 +32,10 @@ public class UserService {
                 if (user.canUpgradeLevel(user))
                     this.upgradeLevel(user);
             }
-            connection.commit();
+            transactionManager.commit(status);
         } catch (Exception e) {
-            connection.rollback();
+            transactionManager.rollback(status);
             throw e;
-        } finally {
-            DataSourceUtils.releaseConnection(connection, dataSource);
-            TransactionSynchronizationManager.unbindResource(dataSource);
-            TransactionSynchronizationManager.clearSynchronization();
         }
     }
 
