@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertThat;
@@ -35,12 +35,13 @@ public class UserServiceTest {
     @Before
     public void setUp() {
         this.userDao.delete();
-        this.users = new ArrayList<>();
-        this.users.add(new User("a", "장윤진", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER - 1, 0));
-        this.users.add(new User("b", "연우", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER, 0));
-        this.users.add(new User("c", "지수", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD - 1));
-        this.users.add(new User("d", "김연아", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD));
-        this.users.add(new User("e", "천우희", "1234", Level.GOLD, 100, Integer.MAX_VALUE));
+        this.users = Arrays.asList(
+                new User("a", "장윤진", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER - 1, 0, "abc@gmail.com"),
+                new User("b", "연우", "1234", Level.BASIC, User.MIN_LOGIN_COUNT_FOR_SILVER, 0, "abc@gmail.com"),
+                new User("c", "지수", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD - 1, "abc@gmail.com"),
+                new User("d", "김연아", "1234", Level.SILVER, 60, User.MIN_RECOMMEND_COUNT_FOR_GOLD, "abc@gmail.com"),
+                new User("e", "천우희", "1234", Level.GOLD, 100, Integer.MAX_VALUE, "abc@gmail.com")
+        );
     }
 
     @Test

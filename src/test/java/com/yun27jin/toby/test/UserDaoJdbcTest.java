@@ -35,9 +35,9 @@ public class UserDaoJdbcTest {
 
     @Before
     public void setUp() {
-        this.user1 = new User("jyj", "장윤진", "1234", Level.BASIC, 1, 0);
-        this.user2 = new User("kyn", "김연아", "1234", Level.SILVER, 55, 10);
-        this.user3 = new User("cwh", "천우희", "1234", Level.GOLD, 100, 40);
+        this.user1 = new User("jyj", "장윤진", "1234", Level.BASIC, 1, 0, "a@gmail.com");
+        this.user2 = new User("kyn", "김연아", "1234", Level.SILVER, 55, 10, "a@gmail.com");
+        this.user3 = new User("cwh", "천우희", "1234", Level.GOLD, 100, 40, "a@gmail.com");
         this.userDao.delete();
     }
 
