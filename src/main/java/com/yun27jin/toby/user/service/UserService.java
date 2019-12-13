@@ -6,8 +6,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.sql.DataSource;
 import java.util.List;
+import java.util.Properties;
 
 public class UserService {
     private UserDao userDao;
@@ -41,7 +41,13 @@ public class UserService {
 
     protected void upgradeLevel(User user) {
         user.upgradeLevel();
-        this.userDao.update(user);
+        userDao.update(user);
+        sendUpgradeEMail(user);
+    }
+
+    private void sendUpgradeEMail(User user) {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.host", "mail.ksug.org");
     }
 
     public static class TestUserService extends UserService {

@@ -2,13 +2,9 @@ package com.yun27jin.toby.user.dao;
 
 import com.yun27jin.toby.user.domain.Level;
 import com.yun27jin.toby.user.domain.User;
-import com.yun27jin.toby.user.exception.DuplicatedUserIdException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoJdbc implements UserDao {
@@ -31,39 +27,14 @@ public class UserDaoJdbc implements UserDao {
         if (user.getLevel() == null)
             level = Level.BASIC;
         this.jdbcTemplate.update(
-                "INSERT INTO toby.users(id, name, password, level, login, recommend) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO toby.users(id, name, password, level, login, recommend, email) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 user.getId(),
                 user.getName(),
                 user.getPassword(),
                 level.intValue(),
                 user.getLogin(),
-                user.getRecommend());
-    }
-
-    public void legacyAdd(User user) throws DuplicatedUserIdException {
-        DataSource dataSource = jdbcTemplate.getDataSource();
-        PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = dataSource.getConnection().prepareStatement("INSERT INTO toby.users(id, name, password) VALUES (?, ?, ?)");
-            preparedStatement.setString(1, user.getId());
-            preparedStatement.setString(2, user.getName());
-            preparedStatement.setString(3, user.getPassword());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            int errorCode = e.getErrorCode();
-            if (errorCode == 1062 || errorCode == 1 || errorCode == -803)
-                throw new DuplicatedUserIdException(e);
-            else
-                throw new RuntimeException(e);
-        } finally {
-            if (preparedStatement != null)
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-
-                }
-        }
-
+                user.getRecommend(),
+                user.getEmail());
     }
 
     public User get(String id) {
@@ -84,7 +55,8 @@ public class UserDaoJdbc implements UserDao {
                         resultSet.getString("password"),
                         Level.valueOf(Integer.parseInt(resultSet.getString("level"))),
                         resultSet.getInt("login"),
-                        resultSet.getInt("recommend"));
+                        resultSet.getInt("recommend"),
+                        resultSet.getString("email"));
     }
 
     public void delete(String id) {
@@ -101,9 +73,9 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public void update(User user) {
-        this.jdbcTemplate.update("UPDATE toby.users SET name = ?, password = ?, level = ?, login = ?, recommend = ? WHERE id = ?",
+        this.jdbcTemplate.update("UPDATE toby.users SET name = ?, password = ?, level = ?, login = ?, recommend = ?, email = ? WHERE id = ?",
                 user.getName(), user.getPassword(), user.getLevel().intValue(),
-                user.getLogin(), user.getRecommend(), user.getId());
+                user.getLogin(), user.getRecommend(), user.getEmail(), user.getId());
     }
 
 }
