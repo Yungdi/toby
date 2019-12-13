@@ -2,6 +2,8 @@ package com.yun27jin.toby.user.service;
 
 import com.yun27jin.toby.user.dao.UserDao;
 import com.yun27jin.toby.user.domain.User;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -11,6 +13,7 @@ import java.util.Properties;
 
 public class UserService {
     private UserDao userDao;
+    private MailSender mailSender;
     private PlatformTransactionManager transactionManager;
 
     public UserService setUserDao(UserDao userDao) {
@@ -20,6 +23,11 @@ public class UserService {
 
     public UserService setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+        return this;
+    }
+
+    public UserService setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
         return this;
     }
 
@@ -46,8 +54,13 @@ public class UserService {
     }
 
     private void sendUpgradeEMail(User user) {
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "mail.ksug.org");
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("yun27jin@gmail.com");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+
+        mailSender.send(mailMessage);
     }
 
     public static class TestUserService extends UserService {

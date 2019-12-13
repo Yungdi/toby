@@ -15,7 +15,6 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.2.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-test', version: '5.2.0.RELEASE'
-    compile group: 'org.springframework', name: 'spring-support', version: '5.2.0.RELEASE'
     compile group: 'org.springframework', name: 'spring-context-support', version: '5.2.0.RELEASE'
 
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.1'

@@ -1,12 +1,16 @@
 package com.yun27jin.toby.user.config;
 
 import com.yun27jin.toby.user.dao.UserDaoJdbc;
+import com.yun27jin.toby.user.service.DummyMailSender;
 import com.yun27jin.toby.user.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
@@ -18,7 +22,8 @@ public class DaoFactory {
     public UserService userService() {
         return new UserService()
                 .setUserDao(userDao())
-                .setTransactionManager(transactionManager());
+                .setTransactionManager(transactionManager())
+                .setMailSender(mailSender());
     }
 
     @Bean
@@ -46,6 +51,11 @@ public class DaoFactory {
         dataSource.setUsername("root");
         dataSource.setPassword("root");
         return dataSource;
+    }
+
+    @Bean
+    public MailSender mailSender() {
+        return new DummyMailSender();
     }
 
 }
